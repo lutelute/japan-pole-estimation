@@ -1,0 +1,8 @@
+tiles/
+yolo_dataset/images/
+__pycache__/
+*.pyc
+*.tmp
+output/
+models/runs/
+*.pt
