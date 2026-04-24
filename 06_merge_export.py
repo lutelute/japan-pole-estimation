@@ -41,12 +41,18 @@ DEDUP_RADIUS  = 10   # OSM内重複除去半径(m)
 def extract_osm_poles(osm_data, pref_name):
     """OSM JSON から電柱フィーチャーリストを生成する"""
     elements = osm_data.get("elements", [])
-    ways  = [e for e in elements if e["type"] == "way"]
     nodes = {e["id"]: e for e in elements if e["type"] == "node"}
+
+    # power=minor_line (6.6kV配電線) のみ対象。power=line (送電鉄塔線) は除外。
+    # minor_line のノード間隔≈34m は電柱間隔に対応するため、ノードを直接電柱位置として採用。
+    minor_line_ways = [
+        e for e in elements
+        if e["type"] == "way" and e.get("tags", {}).get("power") == "minor_line"
+    ]
 
     features = []
 
-    for way in ways:
+    for way in minor_line_ways:
         tags     = way.get("tags", {})
         operator = tags.get("operator", "")
         geom     = way.get("geometry", [])
@@ -77,7 +83,7 @@ def extract_osm_poles(osm_data, pref_name):
                             "way_id"  : str(way["id"]),
                         })
 
-    # 明示的 power=pole ノード
+    # 明示的 power=pole ノード（最も信頼性が高い）
     for nid, n in nodes.items():
         if n.get("tags", {}).get("power") == "pole":
             features.append({
