@@ -188,8 +188,8 @@ OSM 確定電柱（`power=pole`）と YOLOv8 検出電柱を統合し、半径 1
 
 | サーバー | 接続先 | GPU | 役割 |
 |---------|--------|-----|------|
-| pws-gpu | `root@100.126.144.110` (Tailscale) | RTX 4090 24 GB | 学習 + RANK=0 推論 |
-| pws-gpu3060 | `ubuntu@100.117.16.18` (Tailscale) | RTX 3060 12 GB | RANK=1 推論 |
+| pws-gpu | 研究室の内部資料を参照 | RTX 4090 24 GB | 学習 + RANK=0 推論 |
+| pws-gpu3060 | 研究室の内部資料を参照 | RTX 3060 12 GB | RANK=1 推論 |
 
 ---
 
@@ -197,7 +197,8 @@ OSM 確定電柱（`power=pole`）と YOLOv8 検出電柱を統合し、半径 1
 
 ```bash
 # ローカルから一括実行（タイル転送 → 学習 → 推論 → マージ）
-bash run_distributed.sh
+# 接続先（user@host）は環境変数で指定（研究室の内部資料を参照）。未設定ならエラーで止まる
+GPU0_HOST=<user>@<GPU0のホスト> GPU1_HOST=<user>@<GPU1のホスト> bash run_distributed.sh
 ```
 
 このスクリプトは以下を自動化します:

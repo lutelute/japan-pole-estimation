@@ -1,19 +1,24 @@
 #!/usr/bin/env bash
 # 2台のGPUサーバーで並列推論を実行するスクリプト
 #
-# GPU0: pws-gpu    (RTX 4090)  root@100.126.144.110  ← 速いので多めに担当
-# GPU1: pws-gpu3060(RTX 3060)  ubuntu@10.0.70.81
+# GPU0: pws-gpu    (RTX 4090)  ← 速いので多めに担当
+# GPU1: pws-gpu3060(RTX 3060)
+# 接続先（user@host）は環境変数 GPU0_HOST / GPU1_HOST で指定する（研究室の内部資料を参照）
 #
 # 使い方:
-#   bash run_distributed.sh             # 全ステップ実行
-#   bash run_distributed.sh --infer-only # 推論のみ（タイルDL済みの場合）
+#   GPU0_HOST=<user>@<GPU0のホスト> GPU1_HOST=<user>@<GPU1のホスト> bash run_distributed.sh             # 全ステップ実行
+#   GPU0_HOST=<user>@<GPU0のホスト> GPU1_HOST=<user>@<GPU1のホスト> bash run_distributed.sh --infer-only # 推論のみ（タイルDL済みの場合）
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-GPU0_HOST="root@100.126.144.110"
-GPU1_HOST="ubuntu@10.0.70.81"
+GPU0_HOST="${GPU0_HOST:-}"
+GPU1_HOST="${GPU1_HOST:-}"
+if [ -z "$GPU0_HOST" ] || [ -z "$GPU1_HOST" ]; then
+    echo "[ERROR] 環境変数 GPU0_HOST と GPU1_HOST を設定してください（例: GPU0_HOST=<user>@<GPU0のホスト> GPU1_HOST=<user>@<GPU1のホスト> bash run_distributed.sh）。接続先は研究室の内部資料を参照。" >&2
+    exit 1
+fi
 REMOTE_DIR="/home/pole_estimation"   # GPU0 は root なので /root 配下
 GPU0_DIR="/root/pole_estimation"
 GPU1_DIR="/home/ubuntu/pole_estimation"
